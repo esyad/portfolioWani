@@ -66,6 +66,76 @@
     .hero::before, .hero::after { content: ""; position: absolute; z-index: -1; pointer-events: none; }
     .hero::before { inset: .9rem; border: 1px solid #dac09932; }
     .hero::after { width: min(63rem, 88vw); height: 51rem; top: -15rem; right: -14rem; border: 1px solid #dac09921; border-radius: 50%; box-shadow: 0 0 0 24px #dac0990e, 0 0 0 48px #dac0990b; transform: rotate(-38deg); }
+    .hero-atmosphere {
+      position: absolute;
+      z-index: -1;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+    .hero-atmosphere::before, .hero-atmosphere::after {
+      content: "";
+      position: absolute;
+      width: 74%;
+      height: 96%;
+      border-radius: 50%;
+      opacity: .72;
+    }
+    .hero-atmosphere::before {
+      top: -24%;
+      right: -23%;
+      background: radial-gradient(ellipse, #c3a0ec48, #9370c01c 43%, transparent 70%);
+    }
+    .hero-atmosphere::after {
+      left: -29%;
+      bottom: -68%;
+      background: radial-gradient(ellipse, #f8d7ab21, #c69bec1d 47%, transparent 72%);
+    }
+    .hero-mote {
+      position: absolute;
+      top: var(--y);
+      left: var(--x);
+      width: var(--size, 4px);
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: #fce6b5;
+      box-shadow: 0 0 9px #f8d89cab;
+      opacity: .26;
+    }
+    .hero-mote:nth-child(3n) {
+      border-radius: 0;
+      clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
+      background: #f8e5ff;
+    }
+    .motion-control {
+      position: absolute;
+      z-index: 2;
+      right: clamp(1.2rem, 2.8vw, 2.8rem);
+      bottom: 1.4rem;
+      display: grid;
+      place-items: center;
+      width: 2.75rem;
+      height: 2.75rem;
+      border: 1px solid #e2cda668;
+      border-radius: 50%;
+      background: #271b38cc;
+      color: var(--gold);
+      cursor: pointer;
+    }
+    .motion-control:hover { background: #4d355e; }
+    .motion-icon {
+      width: .73rem;
+      height: .78rem;
+      border-inline: 2px solid currentColor;
+    }
+    .hero[data-effects-paused] .motion-icon {
+      width: 0;
+      height: 0;
+      margin-left: .13rem;
+      border: .38rem solid transparent;
+      border-left: .59rem solid currentColor;
+      border-right: 0;
+    }
     .hero-layout { min-height: clamp(34rem, 51vw, 44rem); display: grid; grid-template-columns: minmax(0, 1.17fr) minmax(0, .83fr); align-items: center; gap: clamp(2rem, 6.5vw, 6.5rem); padding-block: 4rem 5.3rem; }
     .eyebrow { display: flex; align-items: center; gap: .65rem; color: var(--purple); font-size: .875rem; font-weight: 700; letter-spacing: .105em; text-transform: uppercase; }
     .eyebrow::before { content: ""; width: .48rem; height: .48rem; flex: none; border: 1px solid currentColor; transform: rotate(45deg); }
@@ -114,7 +184,28 @@
       background: #705088;
       transform: translate(-50%, -50%) rotate(45deg);
     }
-    .portrait img { position: relative; width: 100%; height: auto; aspect-ratio: 4 / 5; object-fit: cover; object-position: center 41%; border-radius: inherit; }
+    .portrait-photo { position: relative; overflow: hidden; border-radius: inherit; }
+    .portrait-photo img { width: 100%; height: auto; aspect-ratio: 4 / 5; object-fit: cover; object-position: center 41%; }
+    .portrait-photo::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(112deg, transparent 36%, #ffedba30 49%, #fff7ef3b 52%, transparent 65%);
+      transform: translateX(-120%);
+    }
+    .portrait-glint {
+      position: absolute;
+      z-index: 2;
+      color: #ffe9bd;
+      line-height: 1;
+      text-shadow: 0 0 12px #ffda99d9;
+      pointer-events: none;
+      opacity: 0;
+    }
+    .portrait-glint.first { top: 17%; left: 1%; font-size: 1.1rem; }
+    .portrait-glint.second { top: 38%; right: -.9rem; font-size: 1.22rem; }
+    .portrait-glint.third { bottom: 12%; left: -.9rem; font-size: .9rem; }
     .portrait .spark { position: absolute; z-index: 1; pointer-events: none; color: var(--gold); font-size: 1.45rem; line-height: 1; }
     .spark.one { right: -2.5rem; top: 22%; }
     .spark.two { left: -2.7rem; bottom: 20%; font-size: 1.95rem; }
@@ -247,9 +338,56 @@
     .viewer button:hover { background: #ffffff25; }
     .viewer .position { min-width: 3.45rem; text-align: center; font-size: .875rem; white-space: nowrap; }
 
+    @keyframes drift-light {
+      from { transform: translate(-6%, 2%) scale(.95); opacity: .47; }
+      to { transform: translate(1%, 17%) scale(1.16); opacity: .86; }
+    }
+    @keyframes float-mote {
+      0%, 100% { transform: translate(0, 5px) scale(.75); opacity: .2; }
+      48% { opacity: .79; }
+      68% { transform: translate(12px, -19px) scale(1.12); }
+    }
+    @keyframes arrive {
+      from { opacity: 0; transform: translateY(22px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes portrait-sheen {
+      from { transform: translateX(-120%); }
+      to { transform: translateX(120%); }
+    }
+    @keyframes portrait-glimmer {
+      0% { opacity: 0; transform: translateY(6px) scale(.5); }
+      42% { opacity: 1; transform: translateY(-5px) scale(1.15); }
+      100% { opacity: 0; transform: translateY(-13px) scale(.8); }
+    }
     @media (prefers-reduced-motion: no-preference) {
-      .await-reveal { opacity: 0; transform: translateY(13px); }
-      .reveal { transition: opacity .52s ease, transform .52s ease; }
+      .effects-ready .hero-atmosphere::before { animation: drift-light 13s ease-in-out infinite alternate; }
+      .effects-ready .hero-atmosphere::after { animation: drift-light 16s -7s ease-in-out infinite alternate-reverse; }
+      .effects-ready .hero-mote { animation: float-mote 7s var(--delay, 0s) ease-in-out infinite; }
+      .hero[data-effects-paused] .hero-atmosphere::before,
+      .hero[data-effects-paused] .hero-atmosphere::after,
+      .hero[data-effects-paused] .hero-mote { animation-play-state: paused; }
+      .hero-layout > div { animation: arrive .72s cubic-bezier(.22, .68, .22, 1) both; }
+      .portrait-photo { animation: arrive .75s .09s cubic-bezier(.22, .68, .22, 1) both; }
+      .await-reveal:not(:focus-within) { opacity: 0; }
+      .is-revealed:not(:focus-within) { animation: arrive .67s var(--reveal-delay, 0ms) cubic-bezier(.22, .68, .22, 1) both; }
+      .event-card:nth-child(3), .certificate:nth-child(2) { --reveal-delay: 80ms; }
+      .event-card:nth-child(4), .certificate:nth-child(3) { --reveal-delay: 140ms; }
+      .event-card:nth-child(5), .certificate:nth-child(4) { --reveal-delay: 200ms; }
+    }
+    @media (prefers-reduced-motion: no-preference) and (hover: hover) and (pointer: fine) {
+      .portrait { transition: transform .28s ease-out, box-shadow .3s ease, border-color .3s ease; }
+      .portrait-photo img { transition: transform .5s cubic-bezier(.22, .68, .22, 1); }
+      .portrait:hover {
+        transform: perspective(56rem) translateY(-5px) rotateX(var(--portrait-rx, 0deg)) rotateY(var(--portrait-ry, 0deg));
+        border-color: #ffe4aa;
+        box-shadow: 0 29px 56px #1b102a65, 0 0 2rem #f7cc8c2b;
+      }
+      .portrait:hover img { transform: scale(1.045); }
+      .portrait:hover .portrait-photo::after { animation: portrait-sheen .88s ease-out; }
+      .portrait:hover .portrait-glint { animation: portrait-glimmer 1s ease-in-out; }
+      .portrait:hover .portrait-glint.second { animation-delay: .12s; }
+      .portrait:hover .portrait-glint.third { animation-delay: .23s; }
     }
     @media (max-width: 68rem) {
       :root { --wrap: min(100% - 4rem, 75rem); }
@@ -293,7 +431,7 @@
       details ul { grid-template-columns: 1fr; }
     }
     @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
+      *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; }
     }
   </style>
 </head>
@@ -313,6 +451,21 @@
   </header>
   <main id="main">
     <section class="hero" aria-labelledby="name">
+      <div class="hero-atmosphere" aria-hidden="true">
+        <span class="hero-mote" style="--x:6%;--y:17%;--delay:-2s"></span>
+        <span class="hero-mote" style="--x:17%;--y:12%;--delay:-5s"></span>
+        <span class="hero-mote" style="--x:39%;--y:77%;--size:9px;--delay:-1s"></span>
+        <span class="hero-mote" style="--x:49%;--y:35%;--delay:-3s"></span>
+        <span class="hero-mote" style="--x:53%;--y:64%;--delay:-4s"></span>
+        <span class="hero-mote" style="--x:59%;--y:16%;--size:12px;--delay:-5s"></span>
+        <span class="hero-mote" style="--x:67%;--y:84%;--size:5px;--delay:-2.5s"></span>
+        <span class="hero-mote" style="--x:82%;--y:11%;--delay:-1s"></span>
+        <span class="hero-mote" style="--x:92%;--y:65%;--size:9px;--delay:-4.5s"></span>
+        <span class="hero-mote" style="--x:94%;--y:25%;--delay:-3s"></span>
+      </div>
+      <button class="motion-control" type="button" aria-label="Pause background animation" title="Pause background animation" hidden>
+        <span class="motion-icon" aria-hidden="true"></span>
+      </button>
       <div class="wrap hero-layout">
         <div>
           <p class="eyebrow">Diploma in Accountancy · UiTM</p>
@@ -324,8 +477,13 @@
           </div>
         </div>
         <figure class="portrait">
-          <img src="assets/portrait.webp" alt="Professional portrait of Siti Hawani" width="960" height="1280" fetchpriority="high">
+          <div class="portrait-photo">
+            <img src="assets/portrait.webp" alt="Professional portrait of Siti Hawani" width="960" height="1280" fetchpriority="high">
+          </div>
           <span class="portrait-crown" aria-hidden="true"></span>
+          <span class="portrait-glint first" aria-hidden="true">✦</span>
+          <span class="portrait-glint second" aria-hidden="true">✧</span>
+          <span class="portrait-glint third" aria-hidden="true">✦</span>
           <span class="spark one" aria-hidden="true">✧</span><span class="spark two" aria-hidden="true">✦</span>
           <figcaption><span aria-hidden="true">◇</span> Papar, Sabah <span aria-hidden="true">◇</span></figcaption>
         </figure>
@@ -489,8 +647,8 @@
         <p class="eyebrow">Recognition</p>
         <h2 id="achievements-title">Achievements &amp; certificates</h2>
       </div>
-      <div class="awards-grid reveal">
-        <figure class="award-feature">
+      <div class="awards-grid">
+        <figure class="award-feature reveal">
           <a class="media-link" href="assets/trophies.webp" data-viewer="Trophy photo" aria-label="Enlarge Trophy photo">
                 <img src="assets/trophies.webp" alt="Siti Hawani holding two UiTM trophies" width="720" height="1280" loading="lazy" decoding="async">
                 <span class="expand" aria-hidden="true">⤢</span>
@@ -498,28 +656,28 @@
           <figcaption>Trophy photo</figcaption>
         </figure>
         <div class="certificate-grid">
-          <figure class="certificate">
+          <figure class="certificate reveal">
               <a class="media-link" href="assets/peers-agm-certificate.webp" data-viewer="PEERs Annual Grand Meeting certificate" aria-label="Enlarge PEERs Annual Grand Meeting certificate">
                 <img src="assets/peers-agm-certificate.webp" alt="Certificate of appreciation for emceeing the PEERs Annual Grand Meeting" width="905" height="1280" loading="lazy" decoding="async">
                 <span class="expand" aria-hidden="true">⤢</span>
               </a>
               <figcaption><h3>PEERs Annual Grand Meeting</h3><p class="role">Emcee · December 2024</p></figcaption>
             </figure>
-            <figure class="certificate">
+            <figure class="certificate reveal">
               <a class="media-link" href="assets/calist-certificate.webp" data-viewer="Campus Life is Best certificate" aria-label="Enlarge Campus Life is Best certificate">
                 <img src="assets/calist-certificate.webp" alt="Certificate of appreciation for serving on the CALIST programme committee" width="899" height="1280" loading="lazy" decoding="async">
                 <span class="expand" aria-hidden="true">⤢</span>
               </a>
               <figcaption><h3>Campus Life is Best</h3><p class="role">Programme committee · May 2024</p></figcaption>
             </figure>
-            <figure class="certificate">
+            <figure class="certificate reveal">
               <a class="media-link" href="assets/battle-arena-certificate.webp" data-viewer="Battle Arena: University Edition certificate" aria-label="Enlarge Battle Arena: University Edition certificate">
                 <img src="assets/battle-arena-certificate.webp" alt="Certificate of appreciation for the Battle Arena committee" width="895" height="1280" loading="lazy" decoding="async">
                 <span class="expand" aria-hidden="true">⤢</span>
               </a>
               <figcaption><h3>Battle Arena: University Edition</h3><p class="role">Event committee · October 2024</p></figcaption>
             </figure>
-            <figure class="certificate">
+            <figure class="certificate reveal">
               <a class="media-link" href="assets/penulis-sabah-certificate.webp" data-viewer="Sijil Bakti Penulis Sabah certificate" aria-label="Enlarge Sijil Bakti Penulis Sabah certificate">
                 <img src="assets/penulis-sabah-certificate.webp" alt="Sijil Bakti Penulis Sabah from Ikatan Penulis Sabah" width="1201" height="1750" loading="lazy" decoding="async">
                 <span class="expand" aria-hidden="true">⤢</span>
@@ -538,8 +696,8 @@
           <p>Papar, Sabah, Malaysia</p>
         </div>
         <div class="contact-actions">
-          <a class="button primary" href="mailto:siti.hawani2004@gmail.com">Email me</a>
-          <a class="email" href="mailto:siti.hawani2004@gmail.com">siti.hawani2004@gmail.com</a>
+          <a class="button primary" href="mailto:hawanihasman@gmail.com">Email me</a>
+          <a class="email" href="mailto:hawanihasman@gmail.com">hawanihasman@gmail.com</a>
         </div>
       </div>
     </section>
@@ -603,6 +761,43 @@
       dialog.addEventListener('close', () => opener?.focus({ preventScroll: true }));
     }
 
+    const hero = document.querySelector('.hero');
+    const portrait = hero.querySelector('.portrait');
+    const motionControl = hero.querySelector('.motion-control');
+    const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
+    const finePointer = matchMedia('(hover: hover) and (pointer: fine)');
+
+    function updateMotionPreference() {
+      hero.classList.toggle('effects-ready', !motionPreference.matches);
+      motionControl.hidden = motionPreference.matches;
+    }
+
+    motionControl.addEventListener('click', () => {
+      const paused = hero.toggleAttribute('data-effects-paused');
+      const label = paused ? 'Resume background animation' : 'Pause background animation';
+      motionControl.setAttribute('aria-label', label);
+      motionControl.title = label;
+    });
+    motionPreference.addEventListener('change', updateMotionPreference);
+    updateMotionPreference();
+
+    let portraitBounds;
+    portrait.addEventListener('pointerenter', () => {
+      portraitBounds = portrait.getBoundingClientRect();
+    });
+    portrait.addEventListener('pointermove', event => {
+      if (!portraitBounds || event.pointerType !== 'mouse' || !finePointer.matches || motionPreference.matches) return;
+      const x = (event.clientX - portraitBounds.left) / portraitBounds.width - .5;
+      const y = (event.clientY - portraitBounds.top) / portraitBounds.height - .5;
+      portrait.style.setProperty('--portrait-rx', (y * -8).toFixed(2) + 'deg');
+      portrait.style.setProperty('--portrait-ry', (x * 9).toFixed(2) + 'deg');
+    });
+    portrait.addEventListener('pointerleave', () => {
+      portraitBounds = null;
+      portrait.style.removeProperty('--portrait-rx');
+      portrait.style.removeProperty('--portrait-ry');
+    });
+
     const progress = document.querySelector('.progress');
     const navLinks = Array.from(document.querySelectorAll('.nav nav a, .nav-contact'));
     const navSections = navLinks.map(link => document.querySelector(link.hash));
@@ -620,15 +815,23 @@
         else link.removeAttribute('aria-current');
       });
     }
-    window.addEventListener('scroll', updateScroll, { passive: true });
-    window.addEventListener('resize', updateScroll);
+    let scrollFrame;
+    function scheduleScrollUpdate() {
+      if (scrollFrame !== undefined) return;
+      scrollFrame = requestAnimationFrame(() => {
+        scrollFrame = undefined;
+        updateScroll();
+      });
+    }
+    window.addEventListener('scroll', scheduleScrollUpdate, { passive: true });
+    window.addEventListener('resize', scheduleScrollUpdate);
     updateScroll();
 
-    if ('IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    if ('IntersectionObserver' in window && !motionPreference.matches) {
       const observer = new IntersectionObserver(entries => {
         entries.forEach(entry => {
           if (!entry.isIntersecting) return;
-          entry.target.classList.remove('await-reveal');
+          entry.target.classList.replace('await-reveal', 'is-revealed');
           observer.unobserve(entry.target);
         });
       }, { rootMargin: '0px 0px 40px 0px' });
